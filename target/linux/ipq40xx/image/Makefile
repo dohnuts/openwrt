@@ -406,6 +406,20 @@ define Device/qxwlan_e2600ac-c2
 endef
 TARGET_DEVICES += qxwlan_e2600ac-c2
 
+
+define Device/citypassenger-hd53
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := Citypassenger
+	DEVICE_MODEL := HD53
+	DEVICE_DTS := qcom-ipq4019-citypassenger-hd53
+	KERNEL_INSTALL := 1
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_PACKAGES := hd53-firmware
+endef
+TARGET_DEVICES += citypassenger-hd53
+
 define Device/zyxel_nbg6617
 	$(call Device/FitImageLzma)
 	DEVICE_VENDOR := ZyXEL

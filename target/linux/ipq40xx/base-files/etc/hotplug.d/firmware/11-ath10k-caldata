@@ -152,6 +152,7 @@ case "$FIRMWARE" in
 	engenius,eap1300 |\
 	openmesh,a42 |\
 	openmesh,a62 |\
+	citypassenger,hd53 |\
 	qxwlan,e2600ac-c1 |\
 	qxwlan,e2600ac-c2)
 		ath10kcal_extract "0:ART" 4096 12064
