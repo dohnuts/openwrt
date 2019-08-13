@@ -271,6 +271,7 @@
 	qcom,mtd-name = "0:ART";
 	qcom,cal-offset = <0x5000>;
 	qcom,cal-len = <12064>;
+	ieee80211-freq-limit = <5470000 5875000>;
 };
 
 &pcie0 {
@@ -292,6 +293,7 @@
 			qcom,mtd-name = "0:ART";
 			qcom,cal-offset = <0x9000>;
 			qcom,cal-len = <12064>;
+			ieee80211-freq-limit = <5170000 5350000>;
 		};
 	};
 };
