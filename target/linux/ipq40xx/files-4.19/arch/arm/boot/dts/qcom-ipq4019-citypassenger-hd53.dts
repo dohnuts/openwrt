@@ -19,6 +19,25 @@
 		reg = <0x80000000 0x10000000>; /* 256MB */
 	};
 
+	/* ? BROKE EVERYTHING ! */
+	//reserved-memory {
+	//	ranges;
+	//	rsvd1@87000000 {
+	//		/* Reserved for other subsystem */
+	//		reg = <0x87000000 0x500000>;
+	//		no-map;
+	//	};
+	//	wifi_dump@87500000 {
+	//		reg = <0x87500000 0x600000>;
+	//		no-map;
+	//	};
+	//	rsvd2@87B00000 {
+	//		/* Reserved for other subsystem */
+	//		reg = <0x87B00000 0x500000>;
+	//		no-map;
+	//	};
+	//};
+
 	soc {
 		rng@22000 {
 			status = "okay";
@@ -95,21 +114,6 @@
 
 		usb3: usb3@8af8800 {
 			status = "okay";
-
-			dwc3@8a00000 {
-				#address-cells = <1>;
-				#size-cells = <0>;
-
-				usb3_port1: port@1 {
-					reg = <1>;
-					#trigger-source-cells = <0>;
-				};
-
-				usb3_port2: port@2 {
-					reg = <2>;
-					#trigger-source-cells = <0>;
-				};
-			};
 		};
 
 		crypto@8e3a000 {
@@ -128,42 +132,6 @@
 			status = "okay";
 		};
 
-		leds {
-			compatible = "gpio-leds";
-
-			led1 {
-				label = "e2600ac:green:wlan0";
-				gpios = <&tlmm 50 GPIO_ACTIVE_LOW>;
-			};
-
-			led2 {
-				label = "e2600ac:green:wlan1";
-				gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
-			};
-
-			led3 {
-				label = "e2600ac:green:usb";
-				gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
-				trigger-sources = <&usb2_port1>, <&usb3_port1>, <&usb3_port2>;
-				linux,default-trigger = "usbport";
-			};
-
-			led4 {
-				label = "e2600ac:green:ctrl1";
-				gpios = <&tlmm 51 GPIO_ACTIVE_LOW>;
-			};
-
-			led5 {
-				label = "e2600ac:green:ctrl2";
-				gpios = <&tlmm 30 GPIO_ACTIVE_LOW>;
-			};
-
-			led6 {
-				label = "e2600ac:green:ctrl3";
-				gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
-			};
-		};
-
 		keys {
 			compatible = "gpio-keys";
 
@@ -171,6 +139,97 @@
 				label = "reset";
 				gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
 				linux,code = <KEY_RESTART>;
+			};
+		};
+	};
+};
+
+
+&blsp1_spi1 {
+	pinctrl-0 = <&spi_0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+	reg-names = "spi_physical", "spi_bam_physical";
+	reg = <0x78b5000 0x600>, <0x7884000 0x23000>;
+	spi-max-frequency = <24000000>;
+	// clocks = <&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>,
+	// 	<&gcc GCC_BLSP1_AHB_CLK>;
+	// clock-names = "core_clk", "iface_clk";
+	flash: m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		// w25q256
+/*
+[    1.122904] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
+[    1.124906] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
+[    1.131339] m25p80: probe of spi0.0 failed with error -2
+*/
+		// compatible = "jedec,spi-nor";
+		/* ?? */
+		compatible = "w25q256,spi-nor";
+		linux,modalias = "m25p80", "w25q256", "n25q128a11";
+		spi-max-frequency = <24000000>;
+		partitions {
+			compatible = "fixed-partitions";
+			SBL1@0 {
+				label = "SBL1";
+				reg = <0x0 0x40000>;
+				read-only;
+			};
+
+			MIBIB@40000 {
+				label = "MIBIB";
+				reg = <0x40000 0x20000>;
+				read-only;
+			};
+
+			QSEE@60000 {
+				label = "QSEE";
+				reg = <0x60000 0x60000>;
+				read-only;
+			};
+
+			CDT@c0000 {
+				label = "CDT";
+				reg = <0xc0000 0x10000>;
+				read-only;
+			};
+
+			DDRPARAMS@d0000 {
+				label = "DDRPARAMS";
+				reg = <0xd0000 0x10000>;
+				read-only;
+			};
+
+			APPSBLENV@e0000 {
+				label = "APPSBLENV";
+				reg = <0xe0000 0x10000>;
+				read-only;
+			};
+
+			APPSBL@f0000 {
+				label = "APPSBL";
+				reg = <0xf0000 0x80000>;
+				read-only;
+			};
+
+			ART@170000 {
+				label = "ART";
+				reg = <0x170000 0x10000>;
+				read-only;
+			};
+
+			HLOS@180000 {
+				label = "ART";
+				reg = <0x180000 0x400000>;
+				read-only;
+			};
+
+			firmware@580000 {
+				compatible = "denx,fit";
+				label = "firmware";
+				reg = <0x580000 0x1600000>;
 			};
 		};
 	};
