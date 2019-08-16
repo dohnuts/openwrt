@@ -38,6 +38,11 @@
 	//	};
 	//};
 
+	/* IS clock Broken ? */
+	//chosen {
+	//	bootargs-append = " clk_ignore_unused";
+	//};
+
 	soc {
 		rng@22000 {
 			status = "okay";
@@ -152,8 +157,10 @@
 	reg-names = "spi_physical", "spi_bam_physical";
 	reg = <0x78b5000 0x600>, <0x7884000 0x23000>;
 	spi-max-frequency = <24000000>;
-	// clocks = <&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>,
-	// 	<&gcc GCC_BLSP1_AHB_CLK>;
+/* Activating clock brok more ~
+[    1.122619] spi_qup: probe of 78b5000.spi failed with error -2
+*/
+	// clocks = <&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>, <&gcc GCC_BLSP1_AHB_CLK>;
 	// clock-names = "core_clk", "iface_clk";
 	flash: m25p80@0 {
 		#address-cells = <1>;
@@ -166,8 +173,19 @@
 [    1.131339] m25p80: probe of spi0.0 failed with error -2
 */
 		// compatible = "jedec,spi-nor";
-		/* ?? */
+/*
+[    1.122912] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
+[    1.124908] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
+[    1.131348] m25p80: probe of spi0.0 failed with error -2  
+*/
 		compatible = "w25q256,spi-nor";
+/*
+[    1.122937] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
+[    1.124904] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
+[    1.131367] m25p80: probe of spi0.0 failed with error -2
+
+*/
+		// compatible = "n25q128a11,spi-nor";
 		linux,modalias = "m25p80", "w25q256", "n25q128a11";
 		spi-max-frequency = <24000000>;
 		partitions {
@@ -287,17 +305,9 @@
 
 	spi_0_pins: spi_0_pinmux {
 		pinmux {
+			pins = "gpio12", "gpio13", "gpio14", "gpio15";
 			function = "blsp_spi0";
-			pins = "gpio13", "gpio14", "gpio15";
-			drive-strength = <12>;
 			bias-disable;
-		};
-		pinmux_cs {
-			function = "gpio";
-			pins = "gpio12";
-			drive-strength = <2>;
-			bias-disable;
-			output-high;
 		};
 	};
 };
