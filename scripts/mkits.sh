@@ -60,7 +60,7 @@ ARCH_UPPER=`echo $ARCH | tr '[:lower:]' '[:upper:]'`
 # Conditionally create fdt information
 if [ -n "${DTB}" ]; then
 	FDT="
-		fdt@1 {
+		fdt@ap.dk04.1-c1 {
 			description = \"${ARCH_UPPER} OpenWrt ${DEVICE} device tree blob\";
 			data = /incbin/(\"${DTB}\");
 			type = \"flat_dt\";
@@ -106,11 +106,11 @@ ${FDT}
 	};
 
 	configurations {
-		default = \"${CONFIG}\";
-		${CONFIG} {
+		default = \"config@ap.dk04.1-c1\";
+		config@ap.dk04.1-c1 {
 			description = \"OpenWrt\";
 			kernel = \"kernel@1\";
-			fdt = \"fdt@1\";
+			fdt = \"fdt@ap.dk04.1-c1\";
 		};
 	};
 };"

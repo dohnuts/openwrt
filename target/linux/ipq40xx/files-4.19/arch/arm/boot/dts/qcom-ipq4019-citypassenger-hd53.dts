@@ -12,7 +12,7 @@
 / {
 
 	model = "Citypassenger HD53";
-	compatible = "qcom,ipq4019";
+	compatible = "ipq40xx-apdk04.1-c1", "qcom,ipq40xx-apdk04.1", "qcom,ipq40xx", "citypassenger-hd53";
 
 	memory {
 		device_type = "memory";
@@ -48,41 +48,45 @@
 			status = "okay";
 		};
 
-		mdio@90000 {
-			status = "okay";
-			pinctrl-0 = <&mdio_pins>;
-			pinctrl-names = "default";
-		};
+		// 4 septembre USA => bugged removed test
+		// mdio@90000 {
+		// 	status = "okay";
+		// 	pinctrl-0 = <&mdio_pins>;
+		// 	pinctrl-names = "default";
+		// 	phy-reset-gpio = <&tlmm 47 0>;
+		// 	bias-disable;
+		// };
 
-		ess-psgmii@98000 {
-			status = "okay";
-		};
-
-		tcsr@1949000 {
-			compatible = "qcom,tcsr";
-			reg = <0x1949000 0x100>;
-			qcom,wifi_glb_cfg = <TCSR_WIFI_GLB_CFG>;
-		};
-
-		tcsr@194b000 {
-			/* select hostmode */
-			compatible = "qcom,tcsr";
-			reg = <0x194b000 0x100>;
-			qcom,usb-hsphy-mode-select = <TCSR_USB_HSPHY_HOST_MODE>;
-			status = "okay";
-		};
-
-		ess_tcsr@1953000 {
-			compatible = "qcom,tcsr";
-			reg = <0x1953000 0x1000>;
-			qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
-		};
-
-		tcsr@1957000 {
-			compatible = "qcom,tcsr";
-			reg = <0x1957000 0x100>;
-			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
-		};
+		// UsELESS ???
+		//ess-psgmii@98000 {
+		//	status = "okay";
+		//};
+//
+		//tcsr@1949000 {
+		//	compatible = "qcom,tcsr";
+		//	reg = <0x1949000 0x100>;
+		//	qcom,wifi_glb_cfg = <TCSR_WIFI_GLB_CFG>;
+		//};
+//
+		//tcsr@194b000 {
+		//	/* select hostmode */
+		//	compatible = "qcom,tcsr";
+		//	reg = <0x194b000 0x100>;
+		//	qcom,usb-hsphy-mode-select = <TCSR_USB_HSPHY_HOST_MODE>;
+		//	status = "okay";
+		//};
+//
+		//ess_tcsr@1953000 {
+		//	compatible = "qcom,tcsr";
+		//	reg = <0x1953000 0x1000>;
+		//	qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
+		//};
+//
+		//tcsr@1957000 {
+		//	compatible = "qcom,tcsr";
+		//	reg = <0x1957000 0x100>;
+		//	qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
+		//};
 
 		usb2: usb2@60f8800 {
 			status = "okay";
@@ -157,6 +161,8 @@
 	reg-names = "spi_physical", "spi_bam_physical";
 	reg = <0x78b5000 0x600>, <0x7884000 0x23000>;
 	spi-max-frequency = <24000000>;
+/* from base example , instead of gpio 12 in spi_0_pins */
+	cs-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
 /* Activating clock brok more ~
 [    1.122619] spi_qup: probe of 78b5000.spi failed with error -2
 */
@@ -166,89 +172,81 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0>;
-		// w25q256
-/*
-[    1.122904] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
-[    1.124906] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
-[    1.131339] m25p80: probe of spi0.0 failed with error -2
-*/
-		// compatible = "jedec,spi-nor";
-/*
-[    1.122912] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
-[    1.124908] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
-[    1.131348] m25p80: probe of spi0.0 failed with error -2  
-*/
 		compatible = "w25q256,spi-nor";
-/*
-[    1.122937] spi_qup 78b5000.spi: IN:block:16, fifo:64, OUT:block:16, fifo:64
-[    1.124904] m25p80 spi0.0: unrecognized JEDEC id bytes: ff, ff, ff
-[    1.131367] m25p80: probe of spi0.0 failed with error -2
-
-*/
-		// compatible = "n25q128a11,spi-nor";
 		linux,modalias = "m25p80", "w25q256", "n25q128a11";
 		spi-max-frequency = <24000000>;
 		partitions {
 			compatible = "fixed-partitions";
-			SBL1@0 {
+			partition@0 {
 				label = "SBL1";
 				reg = <0x0 0x40000>;
 				read-only;
 			};
 
-			MIBIB@40000 {
+			partition@40000 {
 				label = "MIBIB";
 				reg = <0x40000 0x20000>;
 				read-only;
 			};
 
-			QSEE@60000 {
+			partition@60000 {
 				label = "QSEE";
 				reg = <0x60000 0x60000>;
 				read-only;
 			};
 
-			CDT@c0000 {
+			partition@c0000 {
 				label = "CDT";
 				reg = <0xc0000 0x10000>;
 				read-only;
 			};
 
-			DDRPARAMS@d0000 {
+			partition@d0000 {
 				label = "DDRPARAMS";
 				reg = <0xd0000 0x10000>;
 				read-only;
 			};
 
-			APPSBLENV@e0000 {
+			partition@e0000 {
 				label = "APPSBLENV";
 				reg = <0xe0000 0x10000>;
 				read-only;
 			};
 
-			APPSBL@f0000 {
+			partition@f0000 {
 				label = "APPSBL";
 				reg = <0xf0000 0x80000>;
 				read-only;
 			};
 
-			ART@170000 {
+			partition@170000 {
 				label = "ART";
 				reg = <0x170000 0x10000>;
 				read-only;
 			};
 
-			HLOS@180000 {
-				label = "ART";
-				reg = <0x180000 0x400000>;
-				read-only;
+			partition@180000 {
+				label = "HLOS";
+				reg = <0x180000 0x400000>; // trying to let openwrt do his thingy\
+				// reg = <0x180000 0x1A00000>;
+				// compatible = "denx,fit";
+				// read-only;
 			};
 
-			firmware@580000 {
-				compatible = "denx,fit";
+			// trying to let openwrt do his thingy
+			partition@580000 {
 				label = "firmware";
+				compatible = "squashfs,jffs2";
+				// compatible = "denx,uimage";
+				// read-only;
 				reg = <0x580000 0x1600000>;
 			};
+
+			// DONT DO  THIS apparently
+			//overlay@006d0000 {
+			//	label = "overlay";
+			//	reg = <0x006d0000 00010000>;
+			//};
 		};
 	};
 };
@@ -271,6 +269,89 @@
 			pins = "gpio20", "gpio21";
 			function = "blsp_i2c0";
 			bias-disable;
+		};
+	};
+	// sd_0_pins: sd_0_pinmux {
+	// 	sd0 {
+	// 		pins = "gpio23";
+	// 		function = "sdio0";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd1 {
+	// 		pins = "gpio24";
+	// 		function = "sdio1";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd2 {
+	// 		pins = "gpio25";
+	// 		function = "sdio2";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd3 {
+	// 		pins = "gpio26";
+	// 		function = "sdio3";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sdclk {
+	// 		pins = "gpio27";
+	// 		function = "sdio_clk";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_A>;
+	// 		vm-enable;
+	// 	};
+	// 	sdcmd {
+	// 		pins = "gpio28";
+	// 		function = "sdio_cmd";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd4 {
+	// 		pins = "gpio29";
+	// 		function = "sdio4";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd5 {
+	// 		pins = "gpio30";
+	// 		function = "sdio5";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd6 {
+	// 		pins = "gpio31";
+	// 		function = "sdio6";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// 	sd7 {
+	// 		pins = "gpio32";
+	// 		function = "sdio7";
+	// 		pull-res = <RES_35_KOHM>;
+	// 		drive-type = <DRV_TYPE_C>;
+	// 		vm-enable;
+	// 	};
+	// };
+	ts_0_pins: ts_0_pinmux {
+		mux_1 {
+			pins = "gpio34";
+			output-high;
+		};
+		mux_2 {
+			pins= "gpio35";
+			input-enable;
+			bias-pull-up;
 		};
 	};
 
@@ -303,11 +384,26 @@
 		};
 	};
 
+
 	spi_0_pins: spi_0_pinmux {
 		pinmux {
-			pins = "gpio12", "gpio13", "gpio14", "gpio15";
 			function = "blsp_spi0";
+			pins = "gpio13", "gpio14", "gpio15";
+		};
+		pinmux_cs {
+			function = "gpio";
+			pins = "gpio12";
+		};
+		pinconf {
+			pins = "gpio13", "gpio14", "gpio15";
+			drive-strength = <12>;
 			bias-disable;
+		};
+		pinconf_cs {
+			pins = "gpio12";
+			drive-strength = <2>;
+			bias-disable;
+			output-high;
 		};
 	};
 };
