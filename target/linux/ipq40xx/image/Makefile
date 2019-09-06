@@ -410,6 +410,9 @@ TARGET_DEVICES += qxwlan_e2600ac-c2
 define Device/citypassenger-hd53
 	$(call Device/FitImage)
 	$(call Device/UbiFit)
+#       LULUZ
+	IMAGES := hd53.squashfs rootfs.bin
+	IMAGE/rootfs.bin := append-rootfs
 	DEVICE_VENDOR := Citypassenger
 	DEVICE_MODEL := HD53
 	DEVICE_DTS := qcom-ipq4019-citypassenger-hd53
