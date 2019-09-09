@@ -104,7 +104,7 @@
 			mdio_pins: mdio_pinmux {
 				mux_1 {
 					pins = "gpio6";
-					function = "mdio0"; // ipq4019-pinctrl 1000000.pinctrl: invalid function mdio0 in map table
+					function = "mdio"; // ipq4019-pinctrl 1000000.pinctrl: invalid function mdio0 in map table
 					bias-pull-up;
 				};
 				mux_2 {
@@ -275,6 +275,8 @@
 			status = "okay";
 		};
 
+		// Esential for ethernet 1 (POE)
+		// Driver is a patch and is buggy - need more init
 		ess-switch@c000000 {
 			status = "okay";
 		};

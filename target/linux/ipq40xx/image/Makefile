@@ -21,7 +21,7 @@ define Device/FitImage
 endef
 
 define Device/FitImageLzma
-	KERNEL_SUFFIX := -fit-uImage.itb
+	KERNEL_SUFFIX := -fit-lzma-uImage.itb
 	KERNEL = kernel-bin | lzma | fit lzma $$(DTS_DIR)/$$(DEVICE_DTS).dtb
 	KERNEL_NAME := Image
 endef
@@ -411,8 +411,9 @@ define Device/citypassenger-hd53
 	$(call Device/FitImage)
 	$(call Device/UbiFit)
 #       LULUZ
-	IMAGES := hd53.squashfs rootfs.bin
+	IMAGES := kernel.bin rootfs.bin
 	IMAGE/rootfs.bin := append-rootfs
+	IMAGE/kernel.bin := append-kernel
 	DEVICE_VENDOR := Citypassenger
 	DEVICE_MODEL := HD53
 	DEVICE_DTS := qcom-ipq4019-citypassenger-hd53
