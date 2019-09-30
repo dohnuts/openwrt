@@ -85,6 +85,7 @@ case "$FIRMWARE" in
 	engenius,eap2200 |\
 	openmesh,a42 |\
 	openmesh,a62 |\
+	citypassenger,hd53 |\
 	qxwlan,e2600ac-c1 |\
 	qxwlan,e2600ac-c2 |\
 	unielec,u4019-32m)

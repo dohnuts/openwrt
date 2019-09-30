@@ -24,7 +24,7 @@ define Device/FitImage
 endef
 
 define Device/FitImageLzma
-	KERNEL_SUFFIX := -fit-uImage.itb
+	KERNEL_SUFFIX := -fit-lzma-uImage.itb
 	KERNEL = kernel-bin | lzma | fit lzma $$(DTS_DIR)/$$(DEVICE_DTS).dtb
 	KERNEL_NAME := Image
 endef
@@ -583,6 +583,22 @@ define Device/unielec_u4019-32m
 	IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata
 endef
 TARGET_DEVICES += unielec_u4019-32m
+
+define Device/citypassenger-hd53
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	IMAGES := kernel.bin rootfs.bin
+	IMAGE/rootfs.bin := append-rootfs
+	IMAGE/kernel.bin := append-kernel
+	DEVICE_VENDOR := Citypassenger
+	DEVICE_MODEL := HD53
+	DEVICE_DTS := qcom-ipq4019-citypassenger-hd53
+	KERNEL_INSTALL := 1
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_PACKAGES := hd53-firmware
+endef
+TARGET_DEVICES += citypassenger-hd53
 
 define Device/zyxel_nbg6617
 	$(call Device/FitImageLzma)
