@@ -1,0 +1,360 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+ *
+ * Copyright (c) 2019 Falempin Sven <sf@citypassenger.com>
+ *
+ */
+
+#include "qcom-ipq4019.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/soc/qcom,tcsr.h>
+
+/ {
+
+	model = "Citypassenger HD53";
+	compatible = "ipq40xx-apdk04.1-c1", "qcom,ipq40xx-apdk04.1", "qcom,ipq40xx", "citypassenger-hd53";
+
+	chosen {
+		bootargs-append = " clk_ignore_unused";
+	};
+
+	soc {
+		rng@22000 {
+			status = "okay";
+		};
+
+		pinctrl@1000000 {
+			serial_0_pins: serial_pinmux {
+				mux {
+					pins = "gpio16", "gpio17";
+					function = "blsp_uart0";
+					bias-disable;
+				};
+			};
+
+			serial_1_pins: serial1_pinmux {
+				mux {
+					pins = "gpio8", "gpio9";
+					function = "blsp_uart1";
+					bias-disable;
+				};
+			};
+
+			spi_0_pins: spi_0_pinmux {
+				pinmux {
+					function = "blsp_spi0";
+					pins = "gpio13", "gpio14", "gpio15";
+				};
+				pinmux_cs {
+					function = "gpio";
+					pins = "gpio12";
+				};
+				pinconf {
+					pins = "gpio13", "gpio14", "gpio15";
+					drive-strength = <12>;
+					bias-disable;
+				};
+				pinconf_cs {
+					pins = "gpio12";
+					drive-strength = <2>;
+					bias-disable;
+					output-high;
+				};
+			};
+
+			i2c_0_pins: i2c_0_pinmux {
+				pinmux {
+					function = "blsp_i2c0";
+					pins = "gpio20", "gpio21";
+					bias-disable;
+				};
+			};
+
+			nand_pins: nand_pins {
+
+				pullups {
+					pins = "gpio52", "gpio53", "gpio58",
+						"gpio59";
+					function = "qpic";
+					bias-pull-up;
+				};
+
+				pulldowns {
+					pins = "gpio54", "gpio55", "gpio56",
+						"gpio57", "gpio60", "gpio61",
+						"gpio62", "gpio63", "gpio64",
+						"gpio65", "gpio66", "gpio67",
+						"gpio68", "gpio69";
+					function = "qpic";
+					bias-pull-down;
+				};
+			};
+
+			ts_0_pins: ts_0_pinmux {
+				mux_1 {
+					pins = "gpio34";
+					output-high;
+				};
+				mux_2 {
+					pins= "gpio35";
+					input-enable;
+					bias-pull-up;
+				};
+			};
+			mdio_pins: mdio_pinmux {
+				mux_1 {
+					pins = "gpio6";
+					function = "mdio"; // ipq4019-pinctrl 1000000.pinctrl: invalid function mdio0 in map table
+					bias-pull-up;
+				};
+				mux_2 {
+					pins = "gpio7";
+					function = "mdc";
+					bias-pull-up;
+				};
+			};
+		};
+
+		// THIS IS the ETHERNET
+		mdio@90000 {
+			status = "ok";
+			pinctrl-0 = <&mdio_pins>;
+			pinctrl-names = "default";
+			phy-reset-gpio = <&tlmm 47 0>;
+			status = "ok";
+			bias-disable;
+		};
+
+		blsp_dma: dma@7884000 {
+			status = "okay";
+		};
+
+		spi0: spi@78b5000 {
+			pinctrl-0 = <&spi_0_pins>;
+			pinctrl-names = "default";
+			status = "okay";
+			cs-gpios = <&tlmm 12 GPIO_ACTIVE_HIGH>;
+
+			mx25l25635e@0 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				reg = <0>;
+				compatible = "mx25l25635e";
+				spi-max-frequency = <24000000>;
+				partitions {
+					compatible = "fixed-partitions";
+					partition@0 {
+						label = "SBL1";
+						reg = <0x0 0x40000>;
+						read-only;
+					};
+
+					partition@40000 {
+						label = "MIBIB";
+						reg = <0x40000 0x20000>;
+						read-only;
+					};
+
+					partition@60000 {
+						label = "QSEE";
+						reg = <0x60000 0x60000>;
+						read-only;
+					};
+
+					partition@c0000 {
+						label = "CDT";
+						reg = <0xc0000 0x10000>;
+						read-only;
+					};
+
+					partition@d0000 {
+						label = "DDRPARAMS";
+						reg = <0xd0000 0x10000>;
+						read-only;
+					};
+
+					partition@e0000 {
+						label = "APPSBLENV";
+						reg = <0xe0000 0x10000>;
+						read-only;
+					};
+
+					partition@f0000 {
+						label = "APPSBL";
+						reg = <0xf0000 0x80000>;
+						read-only;
+					};
+
+					partition@170000 {
+						label = "ART";
+						reg = <0x170000 0x10000>;
+						read-only;
+					};
+
+					partition@180000 {
+						label = "HLOS";
+						reg = <0x180000 0x400000>;
+						// reg = <0x180000 0x1A00000>;
+						// compatible = "denx,fit";
+						// read-only;
+					};
+
+					// trying to let openwrt do his thingy
+					partition@580000 {
+						label = "rootfs";
+						compatible = "squashfs,jffs2";
+						// compatible = "denx,uimage";
+						// read-only;
+						reg = <0x580000 0x1600000>;
+					};
+
+					// DONT DO THIS apparently
+					//overlay@006d0000 {	
+					//	label = "overlay";
+					//	reg = <0x006d0000 00010000>;
+					//};
+				};
+			};
+		};
+
+		tcsr: tcsr@194b000 {
+			status = "ok";
+		};
+
+		i2c0: i2c@78b7000 { /* BLSP1 QUP2 */
+			pinctrl-0 = <&i2c_0_pins>;
+			pinctrl-1 = <&i2c_0_pins>;
+			pinctrl-names = "i2c_active", "i2c_sleep";
+			qcom,clk-freq-out = <100000>;
+			qcom,clk-freq-in  = <19050000>;
+
+			status = "okay";
+		};
+
+		serial@78af000 {
+			pinctrl-0 = <&serial_0_pins>;
+			pinctrl-names = "default";
+			status = "okay";
+		};
+
+		serial@78b0000 {
+			pinctrl-0 = <&serial_1_pins>;
+			pinctrl-names = "default";
+			status = "okay";
+		};
+
+		usb3_ss_phy: ssphy@9a000 {
+			status = "okay";
+		};
+
+		usb3_hs_phy: hsphy@a6000 {
+			status = "okay";
+		};
+
+		usb3: usb3@8af8800 {
+			status = "okay";
+		};
+
+		usb2_hs_phy: hsphy@a8000 {
+			status = "okay";
+		};
+
+		usb2: usb2@60f8800 {
+			status = "okay";
+		};
+
+		cryptobam: dma@8e04000 {
+			status = "okay";
+		};
+
+		crypto@8e3a000 {
+			status = "okay";
+		};
+
+		watchdog@b017000 {
+			status = "okay";
+		};
+
+		// Esential for ethernet 1 (POE)
+		// Driver is a patch and is buggy - need more init
+		ess-switch@c000000 {
+			status = "okay";
+		};
+
+		edma@c080000 {
+			status = "okay";
+		};
+
+		qpic_bam: dma@7984000 {
+			status = "okay";
+		};
+
+		qpic-nand@7980000 {
+			status = "disabled";
+		};
+
+		nand: qpic-nand@79b0000 {
+			pinctrl-0 = <&nand_pins>;
+			pinctrl-names = "default";
+			status = "okay";
+		};
+
+		//gpio_keys {
+		//	compatible = "gpio-keys";
+		//	button@1 {
+		//		label = "wps";
+		//		linux,code = <KEY_WPS_BUTTON>;
+		//		gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
+		//		linux,input-type = <1>;
+		//	};
+		//};
+	};
+};
+
+
+&usb2_hs_phy {
+	status = "okay";
+};
+
+&wifi0 {
+	status = "okay";
+	wifi_led_num = <2>;         /* Wifi 2G */
+	wifi_led_source = <0>;      /* source id 0 */
+	qcom,mtd-name = "0:ART";
+	qcom,cal-offset = <0x1000>;
+	qcom,cal-len = <12064>;
+};
+
+&wifi1 {
+	status = "okay";
+	wifi_led_num = <1>;         /* Wifi 5G */
+	wifi_led_source = <2>;      /* source id 2 */
+	qcom,mtd-name = "0:ART";
+	qcom,cal-offset = <0x5000>;
+	qcom,cal-len = <12064>;
+	ieee80211-freq-limit = <5470000 5875000>;
+};
+
+&pcie0 {
+	status = "okay";
+	perst-gpio = <&tlmm 38 GPIO_ACTIVE_LOW>;
+	wake-gpio = <&tlmm 40 GPIO_ACTIVE_LOW>;
+	clkreq-gpio = <&tlmm 39 0>;
+
+	bridge@0,0 {
+		reg = <0x00000000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+		ranges;
+
+		wifi2: wifi@0,0 {
+			compatible = "qcom,ath10k";
+			status = "okay";
+			reg = <0 0 0 0 0>;
+			qcom,mtd-name = "0:ART";
+			qcom,cal-offset = <0x9000>;
+			qcom,cal-len = <12064>;
+			ieee80211-freq-limit = <5170000 5350000>;
+		};
+	};
+};
