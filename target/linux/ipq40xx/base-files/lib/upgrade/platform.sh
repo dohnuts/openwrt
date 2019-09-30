@@ -61,6 +61,7 @@ platform_do_upgrade() {
 	aruba,ap-303 |\
 	aruba,ap-303h |\
 	aruba,ap-365 |\
+	citypassenger,hd53 |\
 	avm,fritzbox-7530 |\
 	avm,fritzrepeater-1200 |\
 	avm,fritzrepeater-3000 |\
