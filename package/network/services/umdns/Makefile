@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=umdns
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_SOURCE_URL=$(PROJECT_GIT)/project/mdnsd.git
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2020-04-05
-PKG_SOURCE_VERSION:=ab7a39a5b5a0ff74601dd4e82145ca554c1e2ac6
-PKG_MIRROR_HASH:=135de61439d823f3631fdcf735bc7a94355ba1d7bb0a2e3a0530a75898e322ef
+PKG_SOURCE_DATE:=2020-10-26
+PKG_SOURCE_VERSION:=59e4fc98162d253b4e5ecd110f7bc5ea3962e221
+PKG_MIRROR_HASH:=35fefc76d84c963ccb0aa72ac738065649f361d2946d3bc45fbd205d1dfc3d9f
 
 PKG_MAINTAINER:=John Crispin <john@phrozen.org>
 PKG_LICENSE:=LGPL-2.1
@@ -30,7 +30,7 @@ define Package/umdns
   DEPENDS:=+libubox +libubus +libblobmsg-json
 endef
 
-TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include -Wno-address-of-packed-member
+TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
 
 define Package/umdns/conffiles
 /etc/config/umdns
